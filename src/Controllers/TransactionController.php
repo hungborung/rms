@@ -36,7 +36,7 @@ class TransactionController {
                 break;
         }
         header($response['status_code_header']);
-        if ($response['body']) {
+        if (!empty($response['body'])) {
             echo $response['body'];
         }
     }
@@ -58,6 +58,7 @@ class TransactionController {
         $wallet = $this->wallet->findByName($input['name']);
         if (!$wallet) {
             $response['status_code_header'] = 'HTTP/1.1 500';
+            $response['body'] = null;
         } else {
             $hashCheck = md5($input['name'] . $input['type'] . $input['amount'] . $input['reference']);
             $input['wallet_id'] = $wallet['id'];
@@ -78,11 +79,12 @@ class TransactionController {
 
     private function validateTransaction($input)
     {
+        $splitReference = str_split($input['reference'], 3);
         if (!isset($input['name']) || !preg_match("/^[A-Za-z0-9]{3,255}\S+$/", $input['name']))
             return false;
         else if (!is_int($input['amount']) && (($input['type'] == "BET" && intval($input['amount']) > 0) || ($input['type'] == "WIN" && intval($input['amount']) < 0)))
             return false;
-        else if (!strpos($input['reference'], 'TR-') == 0  || strlen($input['reference']) < 3 || strlen($input['reference']) > 255)
+        else if ($splitReference[0] != 'TR-' || strlen($input['reference']) < 3 || strlen($input['reference']) > 255)
             return false;
 
         return true;
