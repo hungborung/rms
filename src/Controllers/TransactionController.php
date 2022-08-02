@@ -8,15 +8,13 @@ class TransactionController {
 
     private $db;
     private $requestMethod;
-    private $userId;
 
     private $transaction;
     private $wallet;
-    public function __construct($db, $requestMethod, $userId)
+    public function __construct($db, $requestMethod)
     {
         $this->db = $db;
         $this->requestMethod = $requestMethod;
-        $this->userId = $userId;
 
         $this->transaction = new Transaction($db);
         $this->wallet = new Wallet($db);
